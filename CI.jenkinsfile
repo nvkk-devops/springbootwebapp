@@ -18,7 +18,8 @@ podTemplate(yaml: '''
   node(POD_LABEL) {
         container('maven') {
             stage('Checkout') {
-                git 'https://github.com/springframeworkguru/springbootwebapp.git'
+                // git 'https://github.com/springframeworkguru/springbootwebapp.git'
+                checkout scm
             }
             stage('Compile') {
                 sh 'mvn -e --batch-mode clean install -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true'
