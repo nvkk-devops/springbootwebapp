@@ -1,0 +1,50 @@
+podTemplate(yaml: '''
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: kaniko
+        image: 'gcr.io/kaniko-project/executor:debug-v0.23.0'
+        tty: true
+        command:
+        - /busybox/cat
+      - name: maven
+        image: adoptopenjdk/maven-openjdk11
+        command:
+        - sleep
+        args:
+        - 99d
+''') {
+  node(POD_LABEL) {
+        container('maven') {
+            stage('Checkout') {
+                git 'https://github.com/springframeworkguru/springbootwebapp.git'
+            }
+            stage('Compile') {
+                sh 'mvn -e --batch-mode clean install -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true'
+            }
+            stage('Junit') {
+                sh 'mvn -e --batch-mode test -Dmaven.test.skip=false -Dmaven.test.failure.ignore=false'
+            }
+            stage('Sonar') {
+                sh 'echo sonar....'
+            }
+            stage('Quality Gates') {
+                sh 'echo Quality Gates....'
+            }
+            stage('Publish Artefacts') {
+                sh 'echo Publish Artefacts....'
+            }
+            stage('Create Image') {
+                sh 'echo Create Image....'
+            }
+            stage('Scan Image Vulnerabilities') {
+                sh 'echo Image Vulnerabilities....'
+            }
+            stage('Publish Image') {
+                sh 'echo Publish Image....'
+            }
+        }
+    
+  }
+}
