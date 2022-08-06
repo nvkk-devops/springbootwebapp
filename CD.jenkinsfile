@@ -1,9 +1,16 @@
 properties([
-parameters([string(name: 'Choose Version', defaultValue: "", description: "Choose_Image_Version")])
+parameters([
+    string(name: 'Choose_Image_Version', defaultValue: "", description: "Choose_Image_Version")
+    ])
 ])
+def selected_version = env.Choose_Image_Version
+print env.Choose_Image_Version
 
   node() {
-    def selected_version = env.Choose_Image_Version
+        stage('Validate Version') {
+            // TODO validate version
+            print env.Choose_Image_Version
+        }
         stage('Confirm: Deploy To SIT') {
             def deployConfirmedBy = input(
                 id: "confirmation_sit",
@@ -13,10 +20,16 @@ parameters([string(name: 'Choose Version', defaultValue: "", description: "Choos
             // TODO: Validate Selection
         }
         stage('Deploy SIT') {
+            sh """                
+                echo ${selected_version}
+                kubectl -n springbootapp-sit set image deployment/springbootwebapp hackathon=hackathon-ci:${selected_version}                
+            """
+            currentBuild.description = "SIT version: hackathon-cicd:" + selected_version
+        }
+        stage('Health Check : SIT') {
 
             sh """
-                echo ${selected_version}
-                kubectl -n springbootapp-sit set image deployment/springbootapp hackathon=hackathon-ci:${selected_version}                
+                echo 'Health Check : SIT'
             """
         }
         stage('Confirm: Deploy To UAT') {
@@ -31,8 +44,14 @@ parameters([string(name: 'Choose Version', defaultValue: "", description: "Choos
 
             sh """
                 echo ${selected_version}
-                kubectl -n springbootapp-uat set image deployment/springbootapp hackathon=hackathon-ci:${selected_version}                
+                kubectl -n springbootapp-uat set image deployment/springbootwebapp hackathon=hackathon-ci:${selected_version}                
             """
-        }    
+            currentBuild.description = "UAT version: hackathon-cicd:" + selected_version
+        } 
+        stage('Health Check : UAT') {
+            sh """
+                echo 'Health Check : UAT'
+            """
+        }   
     
   }
