@@ -1,0 +1,38 @@
+properties([
+parameters([string(name: 'Choose Version', defaultValue: "", description: "Choose_Image_Version")])
+])
+
+  node() {
+    def selected_version = env.Choose_Image_Version
+        stage('Confirm: Deploy To SIT') {
+            def deployConfirmedBy = input(
+                id: "confirmation_sit",
+                message: "Deploy to SIT", ok: 'Confirm',
+                submitterParameter: 'confirmed_by_user')
+            print deployConfirmedBy
+            // TODO: Validate Selection
+        }
+        stage('Deploy SIT') {
+
+            sh """
+                echo ${selected_version}
+                kubectl -n springbootapp-sit set image deployment/springbootapp hackathon=hackathon-ci:${selected_version}                
+            """
+        }
+        stage('Confirm: Deploy To UAT') {
+            def deployConfirmedBy = input(
+                id: "confirmation_uat",
+                message: "Deploy to UAT", ok: 'Confirm',
+                submitterParameter: 'confirmed_by_uat_user')
+            print deployConfirmedBy
+            // TODO: Validate Selection
+        }
+        stage('Deploy UAT') {
+
+            sh """
+                echo ${selected_version}
+                kubectl -n springbootapp-uat set image deployment/springbootapp hackathon=hackathon-ci:${selected_version}                
+            """
+        }    
+    
+  }
