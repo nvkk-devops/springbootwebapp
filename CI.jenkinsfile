@@ -29,6 +29,9 @@ podTemplate(yaml: '''
             }
             stage('Sonar') {
                 sh 'echo Sonar...'
+                sh """
+                    mvn --batch-mode sonar:sonar - -Dsonar.host.url=http://hackubuntu1.eastus.cloudapp.azure.com:9000 -Dsonar.login=4792b26cf06f7897903bffffda16735154ec460b
+                """
             }
             stage('Quality Gates') {
                 sh 'echo Quality Gates....'
