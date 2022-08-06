@@ -8,4 +8,6 @@ This repository has the project files for a tutorial series on Spring Boot avail
 ```
 
 docker run --rm -it --mount type=bind,source="$(pwd)",target=/apps/src adoptopenjdk/maven-openjdk11 /bin/bash 
+
+funnydemo
 ```
